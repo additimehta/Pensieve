@@ -1,0 +1,475 @@
+/* Root container */
+.pensieve-root {
+    position: fixed;
+    inset: 0;
+    background: #05070d;
+    overflow: hidden;
+    font-family: 'Cinzel Decorative', 'Times New Roman', serif;
+    /* UPDATED FONT */
+    color: #e2e8f0;
+    transition: background-color 2s ease;
+}
+
+/* Ambient Entry State - Darker */
+.pensieve-root.ambient {
+    background: #020305;
+}
+
+/* Animated gradient */
+.gradient-layer {
+    position: absolute;
+    inset: -20%;
+    background: radial-gradient(circle at 20% 30%,
+            rgba(120, 160, 255, 0.15),
+            transparent 60%),
+        radial-gradient(circle at 80% 70%,
+            rgba(180, 200, 255, 0.1),
+            transparent 60%),
+        radial-gradient(circle at 50% 50%,
+            rgba(50, 60, 100, 0.4),
+            transparent 70%);
+    animation: drift 40s ease-in-out infinite alternate;
+    filter: blur(60px);
+    will-change: transform;
+    transition: opacity 2s ease;
+}
+
+.pensieve-root.ambient .gradient-layer {
+    opacity: 0.3;
+    /* Dimmer in ambient mode */
+}
+
+/* Slow gradient movement */
+@keyframes drift {
+    from {
+        transform: translate(-5%, -5%) scale(1);
+    }
+
+    to {
+        transform: translate(5%, 5%) scale(1.1);
+    }
+}
+
+/* SVG swirl */
+.swirl-layer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120vmin;
+    height: 120vmin;
+    opacity: 0.6;
+    pointer-events: none;
+    animation: rotate 120s linear infinite;
+    transition: opacity 1s ease;
+}
+
+@keyframes rotate {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* Runes/Swirl path enhancement */
+.swirl-layer path {
+    filter: drop-shadow(0 0 8px rgba(200, 220, 255, 0.3));
+}
+
+/* Central Content Container */
+.pensieve-content {
+    position: relative;
+    z-index: 10;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* BOWL STYLES */
+.bowl-container {
+    position: relative;
+    width: min(92vw, 92vmin);
+    height: min(58vh, 58vmin);
+    border-radius: 50% / 62%;
+    perspective: 1000px;
+    cursor: pointer;
+    transition: transform 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 1s ease;
+    z-index: 20;
+    transform-style: preserve-3d;
+    /* liquid motion inputs (set from JS) */
+    --mx: 0;
+    --my: 0;
+}
+
+.bowl-rim {
+    position: absolute;
+    inset: -20px;
+    /* Thicker rim */
+    border-radius: 50% / 62%;
+    /* Stone/Metal Conic Gradient */
+    background: radial-gradient(closest-side, transparent 96%, #4a5a75 97%, #1a2535 100%),
+        conic-gradient(from 0deg,
+            #2a3b55, #1a2535, #4a5a75, #8caad6, #4a5a75, #1a2535, #2a3b55);
+    box-shadow:
+        0 0 30px rgba(0, 0, 0, 0.8),
+        inset 0 0 25px rgba(0, 0, 0, 1),
+        0 0 50px rgba(100, 149, 237, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transform: rotateX(58deg);
+}
+
+.bowl-rim::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: 50% / 62%;
+    border: none;
+    /* Simulating runes */
+    animation: rotate 240s linear infinite reverse;
+}
+
+.bowl-liquid {
+    position: absolute;
+    inset: 0;
+    border-radius: 50% / 62%;
+    background:
+        radial-gradient(circle at 50% 55%, rgba(180, 220, 255, 0.18), transparent 38%),
+        radial-gradient(circle at 50% 50%, #0a1120 0%, #000 82%);
+    overflow: hidden;
+    box-shadow: inset 0 0 80px rgba(0, 0, 0, 1);
+    transform: rotateX(58deg) translateZ(1px);
+}
+
+.bowl-liquid::before {
+    /* Bright rim glow + inner falloff (HP-style) */
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50% / 62%;
+    background:
+        radial-gradient(closest-side, rgba(220, 250, 255, 0.0) 62%, rgba(210, 245, 255, 0.22) 72%, rgba(190, 230, 255, 0.10) 78%, rgba(0, 0, 0, 0) 86%),
+        radial-gradient(ellipse at 50% 35%, rgba(255, 255, 255, 0.10), transparent 60%);
+    mix-blend-mode: screen;
+    opacity: 0.85;
+    pointer-events: none;
+    filter: blur(0.2px);
+}
+
+.bowl-liquid::after {
+    /* Subtle surface caustics shimmer (animated, but not a big "orbiting oval") */
+    content: "";
+    position: absolute;
+    inset: -10%;
+    border-radius: 50% / 62%;
+    background:
+        radial-gradient(circle at 35% 45%, rgba(255, 255, 255, 0.09), transparent 55%),
+        radial-gradient(circle at 65% 55%, rgba(200, 235, 255, 0.08), transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05), transparent 70%);
+    filter: url(#liquidSmoke);
+    opacity: 0.55;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    transform: translate(calc(var(--mx) * -10px), calc(var(--my) * -8px)) scale(1.02);
+}
+
+/* Liquid Surface & Smoke */
+.liquid-surface {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* no rotation; motion is cursor-driven */
+}
+
+.liquid-layer {
+    position: absolute;
+    inset: -20%;
+    border-radius: 50% / 62%;
+    filter: url(#liquidSmoke);
+    will-change: transform;
+    opacity: 0.9;
+}
+
+.liquid-layer-1 {
+    background:
+        radial-gradient(circle at 35% 30%, rgba(210, 235, 255, 0.22), transparent 55%),
+        radial-gradient(circle at 65% 70%, rgba(160, 200, 255, 0.12), transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.06), transparent 70%);
+    transform: translate(calc(var(--mx) * 10px), calc(var(--my) * 8px)) scale(1.03);
+}
+
+.liquid-layer-2 {
+    background:
+        radial-gradient(circle at 30% 65%, rgba(130, 170, 255, 0.14), transparent 55%),
+        radial-gradient(circle at 70% 40%, rgba(220, 245, 255, 0.10), transparent 60%);
+    transform: translate(calc(var(--mx) * -14px), calc(var(--my) * -10px)) scale(1.06);
+    opacity: 0.75;
+    mix-blend-mode: screen;
+}
+
+.liquid-layer-3 {
+    background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.06), transparent 70%),
+        radial-gradient(circle at 55% 55%, rgba(180, 220, 255, 0.12), transparent 65%),
+        radial-gradient(circle at 45% 45%, rgba(160, 210, 255, 0.10), transparent 62%);
+    transform: translate(calc(var(--mx) * 20px), calc(var(--my) * -16px)) scale(1.08);
+    opacity: 0.5;
+    mix-blend-mode: color-dodge;
+}
+
+.liquid-highlight {
+    position: absolute;
+    inset: 0;
+    border-radius: 50% / 62%;
+    background: radial-gradient(ellipse at 50% 20%, rgba(255, 255, 255, 0.18), transparent 55%);
+    transform: translate(calc(var(--mx) * -6px), calc(var(--my) * -4px));
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0.8;
+}
+
+.bowl-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: 50% / 62%;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(220, 245, 255, 0.20), transparent 72%),
+        radial-gradient(circle at 50% 70%, rgba(110, 170, 255, 0.10), transparent 65%);
+    pointer-events: none;
+    animation: pulseGlow 5s ease-in-out infinite alternate;
+    mix-blend-mode: color-dodge;
+    transform: translate(calc(var(--mx) * 4px), calc(var(--my) * 3px));
+}
+
+@keyframes pulseGlow {
+    from {
+        opacity: 0.3;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 0.6;
+        transform: scale(1.05);
+    }
+}
+
+/* ZOOM TRANSITION */
+.pensieve-root.diving .bowl-container {
+    transform: scale(15);
+    opacity: 0;
+}
+
+/* Hiding title/UI during dive */
+.fade-out {
+    opacity: 0;
+    transition: opacity 1s ease;
+    pointer-events: none;
+}
+
+.fade-in {
+    opacity: 1;
+    transition: opacity 2s ease 1s;
+    /* Delay fade in */
+}
+
+/* MEMORY ORB STYLES */
+.orb {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, #9bb6ff);
+    box-shadow: 0 0 15px rgba(160, 180, 255, 0.8), 0 0 30px rgba(160, 180, 255, 0.4);
+    animation: floatOrb 10s ease-in-out infinite;
+    opacity: 0.8;
+    mix-blend-mode: screen;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.orb:hover {
+    transform: scale(1.5) !important;
+    box-shadow: 0 0 25px rgba(200, 220, 255, 1);
+    z-index: 50;
+}
+
+.orb-content {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+    width: Max-content;
+    transform: translate(-50%, -150%);
+    transition: opacity 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    /* Keep content readable */
+    font-size: 0.9rem;
+}
+
+.orb:hover .orb-content {
+    opacity: 1;
+}
+
+@keyframes floatOrb {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translate(20px, -30px) scale(1.2);
+        opacity: 0.9;
+    }
+}
+
+.close-btn {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Cinzel Decorative', serif;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 15px rgba(160, 180, 255, 0.4);
+}
+
+/* MEMORY VIEW UI (popup instead of alert) */
+.memory-view {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+}
+
+.memory-hints {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+    opacity: 0.7;
+    letter-spacing: 1px;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.95rem;
+    pointer-events: none;
+}
+
+.memory-hint strong {
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.memory-popup-backdrop {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 40%, rgba(10, 14, 26, 0.6), rgba(0, 0, 0, 0.85));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.memory-popup {
+    width: min(560px, 92vw);
+    border-radius: 18px;
+    border: 1px solid rgba(200, 220, 255, 0.22);
+    background: rgba(6, 8, 14, 0.72);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.65), 0 0 30px rgba(120, 160, 255, 0.15);
+    padding: 18px 18px 16px 18px;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.memory-popup-title {
+    font-size: 1.25rem;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.memory-popup-text {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    opacity: 0.92;
+    white-space: pre-wrap;
+    margin-bottom: 14px;
+}
+
+.memory-popup-close,
+.memory-popup-primary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Cinzel Decorative', serif;
+    letter-spacing: 1px;
+}
+
+.memory-popup-primary {
+    background: rgba(140, 170, 255, 0.16);
+    border-color: rgba(170, 200, 255, 0.3);
+}
+
+.memory-popup-close:hover,
+.memory-popup-primary:hover {
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 0 18px rgba(160, 180, 255, 0.25);
+}
+
+.memory-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.memory-input,
+.memory-textarea {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid rgba(200, 220, 255, 0.22);
+    background: rgba(0, 0, 0, 0.25);
+    color: rgba(255, 255, 255, 0.92);
+    padding: 10px 12px;
+    outline: none;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1rem;
+}
+
+.memory-input:focus,
+.memory-textarea:focus {
+    border-color: rgba(180, 210, 255, 0.45);
+    box-shadow: 0 0 0 3px rgba(120, 160, 255, 0.18);
+}
+
+.memory-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
