@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import "../pensieve.css";
 
 export default function Bowl({ isActive, onEnter }) {
@@ -119,11 +119,13 @@ export default function Bowl({ isActive, onEnter }) {
                     </defs>
                 </svg>
 
-                {/* Cursor-driven liquid layers (no rotating rings) */}
                 <div className="liquid-surface">
-                    <div className="liquid-layer liquid-layer-1" />
-                    <div className="liquid-layer liquid-layer-2" />
-                    <div className="liquid-layer liquid-layer-3" />
+                    <div className="swirl swirl-a" />
+                    <div className="swirl swirl-b" />
+                    <div className="swirl swirl-c" />
+                    <div className="swirl swirl-d" />
+                    <div className="silver-veil veil-a" />
+                    <div className="silver-veil veil-b" />
                     <div className="liquid-highlight" />
                 </div>
 
