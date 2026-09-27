@@ -96,18 +96,7 @@ function App() {
           alignItems: 'center'
         }}>
 
-        <h1 style={{
-          fontSize: '4rem',
-          fontWeight: 200,
-          letterSpacing: '0.2em',
-          textShadow: '0 0 20px rgba(180, 200, 255, 0.5)',
-          marginBottom: '2rem',
-          fontFamily: 'Times New Roman, serif',
-          color: '#fff',
-          zIndex: 30
-        }}>
-          PENSIEVE
-        </h1>
+        <h1 className="pensieve-title">PENSIEVE</h1>
 
         <Bowl onEnter={diveIn} isActive={isDiving} />
 
