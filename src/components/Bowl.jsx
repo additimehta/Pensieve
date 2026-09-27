@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import "../pensieve.css";
 
-export default function Bowl({ isActive, onEnter }) {
+export default function Bowl() {
     const containerRef = useRef(null);
     const rafRef = useRef(0);
     const targetRef = useRef({ x: 0, y: 0 });
@@ -49,7 +49,6 @@ export default function Bowl({ isActive, onEnter }) {
         <div
             ref={containerRef}
             className="bowl-container"
-            onClick={onEnter}
             onMouseMove={onMouseMove}
             onMouseLeave={onMouseLeave}
         >
